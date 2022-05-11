@@ -40,7 +40,7 @@
                 <ul class="list-group">
                     <li class="list-group mb-2">Пользователи:</li>
                     {{range .Users}}
-                    <li class="list-group-item">{{.FirstName}} {{.LastName}} <button
+                    <li class="list-group-item">{{.Id}} {{.FirstName}} {{.LastName}} <button
                             class="btn btn-primary">Add</button></li>
                     {{end}}
                 </ul>
@@ -50,7 +50,7 @@
                 <ul class="list-group">
                     <li class="list-group mb-2">Друзья:</li>
                     {{range .Friends}}
-                    <li class="list-group-item">{{.FirstName}} {{.LastName}} <button
+                    <li class="list-group-item">{{.Id}} {{.FirstName}} {{.LastName}} <button
                             class="btn btn-danger">Delete</button></li>
                     {{end}}
                 </ul>

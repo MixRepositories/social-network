@@ -134,15 +134,30 @@ func CreateUser(
 	return nil
 }
 
-func GetUsers() ([]structs.User, error) {
+func GetUsers(exception []uint16) ([]structs.User, error) {
 	var users []structs.User
+
+	var test string
+
+	for i := 0; i < len(exception); i++ {
+		template := "id !="
+		if i == 0 {
+			test = test + fmt.Sprintf("%s %d", template, exception[i])
+		} else {
+			test = test + fmt.Sprintf(" AND %s %d", template, exception[i])
+		}
+	}
+
+	print(test)
 
 	db, dbErr := sql.Open("mysql", constants.DBConfig)
 	if dbErr != nil {
 		return users, dbErr
 	}
 
-	result, resultErr := db.Query("SELECT `id`, `email`, `first_name`, `last_name` FROM `users`")
+	result, resultErr := db.Query(
+		fmt.Sprintf("SELECT `id`, `email`, `first_name`, `last_name` FROM `users` WHERE %s", test),
+	)
 
 	if resultErr != nil {
 		return users, resultErr

@@ -35,15 +35,6 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, _ := dal.GetUserById(claims.Id)
-  
-	// println("user.Id", user.Id)
-	// println("user.FirstName", user.FirstName)
-	// println("user.LastName", user.LastName)
-	// println("user.Birthday", user.Birthday)
-	// println("user.City", user.City)
-	// println("user.Email", user.Email)
-	// println("user.Interests", user.Interests)
-	// println("user.Password", user.Password)
 
 	profileTemplate, _ := template.ParseFiles("html/profile.html")
 	profileTemplate.Execute(w, user)

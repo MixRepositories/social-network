@@ -7,6 +7,47 @@ import (
 	"highload-architect/pkg/structs"
 )
 
+func getFriendsByParams(id uint16, joinParam string, joinBy string) ([]structs.User, error) {
+	var users []structs.User
+
+	db, dbErr := sql.Open("mysql", constants.DBConfig)
+	if dbErr != nil {
+		return users, dbErr
+	}
+
+	result, err := db.Query(
+		fmt.Sprintf(
+			"SELECT `id`, `first_name`, `last_name` FROM friends f LEFT JOIN users u ON u.id=%s WHERE f.%s='%d'",
+			joinParam,
+			joinBy,
+			id,
+		),
+	)
+	if err != nil {
+		return users, err
+	}
+
+	for result.Next() {
+		var user structs.User
+
+		scanErr := result.Scan(
+			&user.Id,
+			&user.FirstName,
+			&user.LastName,
+		)
+
+		if scanErr != nil {
+			return users, scanErr
+		}
+
+		users = append(users, user)
+	}
+
+	result.Close()
+	db.Close()
+	return users, nil
+}
+
 func GetFriends(id uint16) ([]structs.User, error) {
 	var users []structs.User
 
@@ -15,37 +56,19 @@ func GetFriends(id uint16) ([]structs.User, error) {
 		return users, dbErr
 	}
 
-	result, resultErr := db.Query(
-		fmt.Sprintf(
-			"SELECT `id`, `first_name`, `last_name` FROM friends f LEFT JOIN users u ON u.id = user_id_2 WHERE f.user_id_1 = %d",
-			id,
-		),
-	)
-
-	if resultErr != nil {
-		return users, resultErr
+	resultUser_1, resultErrUser_1 := getFriendsByParams(id, "user_id_2", "user_id_1")
+	if resultErrUser_1 != nil {
+		return users, resultErrUser_1
 	}
 
-	for result.Next() {
-		var user structs.User
-
-		scanErr := result.Scan(
-			&user.Id,
-			&user.Email,
-			&user.FirstName,
-			&user.LastName,
-		)
-
-		if scanErr != nil {
-			return users, resultErr
-		}
-
-		users = append(users, user)
+	resultUser_2, resultErrUser_2 := getFriendsByParams(id, "user_id_1", "user_id_2")
+	if resultErrUser_2 != nil {
+		return users, resultErrUser_2
 	}
-	// INSERT INTO `friends` (`id`, `user_id_1`, `user_id_2`) VALUES (NULL, '11', '13')
-	// SELECT * FROM friends f LEFT JOIN users u ON u.id = user_id_1 WHERE f.user_id_1 = 11;
-	// SELECT * FROM friends f LEFT JOIN users u ON u.id = user_id_1 WHERE f.user_id_1 = 11 OR f.user_id_2 = 11;
-	result.Close()
+
+	users = append(users, resultUser_1...)
+	users = append(users, resultUser_2...)
+
 	db.Close()
 	return users, nil
 }

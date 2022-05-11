@@ -41,9 +41,23 @@ func getFriends(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	friends, friendsErr := dal.GetFriends(claims.Id)
+
+	if friendsErr != nil {
+		fmt.Println("friendsErr", friendsErr)
+		http.Error(w, "Ошибка!", http.StatusInternalServerError)
+		return
+	}
+
+	var exception []uint16
+	for i := 0; i < len(friends); i++ {
+		exception = append(exception, friends[i].Id)
+	}
+	exception = append(exception, claims.Id)
+
 	var tmpData TmpData
 
-	users, usersErr := dal.GetUsers()
+	users, usersErr := dal.GetUsers(exception)
 
 	if usersErr != nil {
 		fmt.Println(usersErr)
@@ -51,12 +65,6 @@ func getFriends(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	friends, friendsErr := dal.GetFriends(claims.Id)
-	if friendsErr != nil {
-		fmt.Println(friendsErr)
-		http.Error(w, "Ошибка!", http.StatusInternalServerError)
-		return
-	}
 	tmpData.Users = users
 	tmpData.Friends = friends
 
