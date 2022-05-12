@@ -99,18 +99,6 @@ func CreateUser(
 		return err
 	}
 
-	fmt.Println(fmt.Sprintf(
-		"INSERT INTO `users` (`email`, `password`, `first_name`, `last_name`, `birthday`, `gender`, `city`, `interests`) value ('%s', '%s', '%s', '%s', '%s', %s, '%s', '%s')",
-		email,
-		hashPassword,
-		firstName,
-		lastName,
-		birthday,
-		gender,
-		city,
-		interests,
-	))
-
 	insert, insertErr := db.Query(
 		fmt.Sprintf(
 			"INSERT INTO `users` (`email`, `password`, `first_name`, `last_name`, `birthday`, `gender`, `city`, `interests`) value ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
@@ -137,18 +125,16 @@ func CreateUser(
 func GetUsers(exception []uint16) ([]structs.User, error) {
 	var users []structs.User
 
-	var test string
+	var exceptionStr string
 
 	for i := 0; i < len(exception); i++ {
-		template := "id !="
-		if i == 0 {
-			test = test + fmt.Sprintf("%s %d", template, exception[i])
+		if i == len(exception)-1 {
+			exceptionStr = exceptionStr + fmt.Sprintf("%d", exception[i])
+
 		} else {
-			test = test + fmt.Sprintf(" AND %s %d", template, exception[i])
+			exceptionStr = exceptionStr + fmt.Sprintf("%d, ", exception[i])
 		}
 	}
-
-	print(test)
 
 	db, dbErr := sql.Open("mysql", constants.DBConfig)
 	if dbErr != nil {
@@ -156,7 +142,7 @@ func GetUsers(exception []uint16) ([]structs.User, error) {
 	}
 
 	result, resultErr := db.Query(
-		fmt.Sprintf("SELECT `id`, `email`, `first_name`, `last_name` FROM `users` WHERE %s", test),
+		fmt.Sprintf("SELECT `id`, `email`, `first_name`, `last_name` FROM `users` WHERE id not in (%s)", exceptionStr),
 	)
 
 	if resultErr != nil {
