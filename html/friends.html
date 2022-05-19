@@ -74,12 +74,16 @@
         crossorigin="anonymous"></script>
     <script>
         let addButtons = document.getElementsByClassName('button_delete');
-        console.log(addButtons);
+        
         [...addButtons].forEach(item => {
             item.addEventListener('click', async (e) => {
                 const result = await fetch('/friends/?friendId=' + e.target.dataset.id, {
                     method: 'DELETE',
                 })
+
+                if (result.status === 200) {
+                    window.location.reload()
+                }
             });
         });
 
