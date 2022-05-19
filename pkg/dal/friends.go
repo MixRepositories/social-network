@@ -48,6 +48,28 @@ func getFriendsByParams(id uint16, joinParam string, joinBy string) ([]structs.U
 	return users, nil
 }
 
+func deleteFriendsById(friendId string, side string) error {
+	db, dbErr := sql.Open("mysql", constants.DBConfig)
+	if dbErr != nil {
+		return dbErr
+	}
+
+	result, err := db.Query(
+		fmt.Sprintf(
+			"DELETE FROM `friends` WHERE `%s` = %s",
+			side,
+			friendId,
+		),
+	)
+	if err != nil {
+		return err
+	}
+
+	result.Close()
+	db.Close()
+	return nil
+}
+
 func GetFriends(id uint16) ([]structs.User, error) {
 	var users []structs.User
 
@@ -71,4 +93,66 @@ func GetFriends(id uint16) ([]structs.User, error) {
 
 	db.Close()
 	return users, nil
+}
+
+func CreateFriends(id uint16, friendId string) error {
+
+	db, dbErr := sql.Open("mysql", constants.DBConfig)
+	if dbErr != nil {
+		return dbErr
+	}
+
+	_, err := db.Query(
+		fmt.Sprintf(
+			"INSERT INTO friends (user_id_1, user_id_2) VALUES (%d, %s)",
+			id,
+			friendId,
+		),
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func DeleteFriend(selfId uint16, friendId string) error {
+	println("dal DeleteFriend")
+	db, dbErr := sql.Open("mysql", constants.DBConfig)
+	if dbErr != nil {
+		return dbErr
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+
+	_, err_1 := tx.Exec(
+		fmt.Sprintf(
+			"DELETE FROM `friends` WHERE `user_id_1` = %d AND `user_id_2` = %s",
+			selfId,
+			friendId,
+		),
+	)
+	if err_1 != nil {
+		tx.Rollback()
+		return err_1
+	}
+
+	_, err_2 := tx.Exec(
+		fmt.Sprintf(
+			"DELETE FROM `friends` WHERE `user_id_1` = %s AND `user_id_2` = %d",
+			friendId,
+			selfId,
+		),
+	)
+	if err_2 != nil {
+		tx.Rollback()
+		return err_2
+	}
+
+	db.Close()
+	err = tx.Commit()
+	return err
 }

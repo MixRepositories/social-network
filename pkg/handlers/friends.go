@@ -16,9 +16,14 @@ type TmpData struct {
 }
 
 func Friends(w http.ResponseWriter, r *http.Request) {
+	println(r.Method)
 	switch r.Method {
 	case "GET":
 		getFriends(w, r)
+	case "POST":
+		postFriends(w, r)
+	case "DELETE":
+		deleteFriends(w, r)
 	default:
 		http.Error(w, "Метод запрещен!", http.StatusMethodNotAllowed)
 	}
@@ -70,4 +75,79 @@ func getFriends(w http.ResponseWriter, r *http.Request) {
 
 	homeTemplate, _ := template.ParseFiles("html/friends.html")
 	homeTemplate.Execute(w, tmpData)
+}
+
+func postFriends(w http.ResponseWriter, r *http.Request) {
+	tokenStr, err := r.Cookie("token")
+	if err != nil {
+		http.Redirect(w, r, "/sign-in/", http.StatusMovedPermanently)
+		return
+	}
+
+	claims, errValid := utils.ValidateJWT(tokenStr.Value)
+
+	if errValid != nil {
+		cookie := &http.Cookie{Path: "/", Name: "token", Value: "", HttpOnly: true, MaxAge: 1}
+		http.SetCookie(w, cookie)
+
+		http.Redirect(w, r, "/sign-in/", http.StatusMovedPermanently)
+		return
+	}
+
+	friendId := r.FormValue("friendId")
+
+	friendsErr := dal.CreateFriends(claims.Id, friendId)
+
+	if friendsErr != nil {
+		fmt.Println("friendsErr", friendsErr)
+		http.Error(w, "Ошибка!", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/friends/", http.StatusMovedPermanently)
+}
+
+func deleteFriends(w http.ResponseWriter, r *http.Request) {
+	println("deleteFriends")
+
+	// println(r.Method)
+	// r.Method = "GET"
+	// println(r.Method)
+
+	tokenStr, err := r.Cookie("token")
+	if err != nil {
+		println("err != nil")
+
+		http.Redirect(w, r, "/sign-in/", http.StatusMovedPermanently)
+		return
+	}
+
+	claims, errValid := utils.ValidateJWT(tokenStr.Value)
+
+	if errValid != nil {
+		println("errValid != nil")
+
+		cookie := &http.Cookie{Path: "/", Name: "token", Value: "", HttpOnly: true, MaxAge: 1}
+		http.SetCookie(w, cookie)
+
+		http.Redirect(w, r, "/sign-in/", http.StatusMovedPermanently)
+		return
+	}
+
+	query := r.URL.Query()
+	friendIds, present := query["friendId"]
+	if !present || len(friendIds) == 0 {
+		http.Error(w, "friendId not present!", http.StatusInternalServerError)
+		return
+	}
+
+	friendId := friendIds[0]
+	selfId := claims.Id
+	println("friendId", friendId)
+	errDeleteFriend := dal.DeleteFriend(selfId, friendId)
+
+	if errDeleteFriend != nil {
+		http.Error(w, "Ошибка!", http.StatusInternalServerError)
+		return
+	}
 }

@@ -40,8 +40,13 @@
                 <ul class="list-group">
                     <li class="list-group mb-2">Пользователи:</li>
                     {{range .Users}}
-                    <li class="list-group-item">{{.Id}} {{.FirstName}} {{.LastName}} <button data-id={{.Id}}
-                            class="btn btn-primary button_add">Add</button></li>
+                    <li class="list-group-item">
+                        <form method="POST" action="/friends/">
+                            {{.Id}} {{.FirstName}} {{.LastName}}
+                            <input name="friendId" value={{.Id}} hidden>
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </form>
+                    </li>
                     {{end}}
                 </ul>
             </div>
@@ -50,8 +55,10 @@
                 <ul class="list-group">
                     <li class="list-group mb-2">Друзья:</li>
                     {{range .Friends}}
-                    <li class="list-group-item">{{.Id}} {{.FirstName}} {{.LastName}} <button
-                            class="btn btn-danger">Delete</button></li>
+                    <li class="list-group-item">
+                        {{.Id}} {{.FirstName}} {{.LastName}}
+                        <button class="btn btn-danger button_delete" data-id={{.Id}}>Delete</button>
+                    </li>
                     {{end}}
                 </ul>
             </div>
@@ -66,11 +73,16 @@
         integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
         crossorigin="anonymous"></script>
     <script>
-        let elem = document.getElementsByClassName('button_add');
-        console.log(elem);
-        function onAddFriend(e) {
-            console.log('onAddFriend', this.innerHTML);
-        }
+        let addButtons = document.getElementsByClassName('button_delete');
+        console.log(addButtons);
+        [...addButtons].forEach(item => {
+            item.addEventListener('click', async (e) => {
+                const result = await fetch('/friends/?friendId=' + e.target.dataset.id, {
+                    method: 'DELETE',
+                })
+            });
+        });
+
     </script>
 </body>
 
