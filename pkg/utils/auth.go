@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"net/http"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -58,4 +59,24 @@ func ValidateJWT(jwtToken string) (customClaims, error) {
 	}
 
 	return *claims, nil
+}
+
+func CheckAuthRedirect(w http.ResponseWriter, r *http.Request) (customClaims, error) {
+	tokenStr, err := r.Cookie("token")
+	if err != nil {
+		http.Redirect(w, r, "/sign-in/", http.StatusMovedPermanently)
+		return customClaims{}, err
+	}
+
+	claims, errValid := ValidateJWT(tokenStr.Value)
+
+	if errValid != nil {
+		cookie := &http.Cookie{Path: "/", Name: "token", Value: "", HttpOnly: true, MaxAge: 1}
+		http.SetCookie(w, cookie)
+
+		http.Redirect(w, r, "/sign-in/", http.StatusMovedPermanently)
+		return customClaims{}, errValid
+	}
+
+	return claims, nil
 }

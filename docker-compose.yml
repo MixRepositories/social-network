@@ -1,0 +1,33 @@
+version: '3'
+services:
+  go:
+    build:
+      context: .
+      dockerfile: DockerFile
+    command: /bin/sh -c "go run main.go"
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/app
+    ports:
+      - 8080:4549
+    depends_on:
+      - "db"
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: '!Novosib54'
+      MYSQL_DATABASE: social_network
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: '!Novosib54'
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db/:/etc/mysql/conf.d/
+    ports:
+      - 3306:3306
+
+volumes:
+  db-data:
+    driver: local

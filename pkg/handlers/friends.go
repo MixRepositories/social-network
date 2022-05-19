@@ -30,19 +30,8 @@ func Friends(w http.ResponseWriter, r *http.Request) {
 }
 
 func getFriends(w http.ResponseWriter, r *http.Request) {
-	tokenStr, err := r.Cookie("token")
-	if err != nil {
-		http.Redirect(w, r, "/sign-in/", http.StatusMovedPermanently)
-		return
-	}
-
-	claims, errValid := utils.ValidateJWT(tokenStr.Value)
-
-	if errValid != nil {
-		cookie := &http.Cookie{Path: "/", Name: "token", Value: "", HttpOnly: true, MaxAge: 1}
-		http.SetCookie(w, cookie)
-
-		http.Redirect(w, r, "/sign-in/", http.StatusMovedPermanently)
+	claims, errClaims := utils.CheckAuthRedirect(w, r)
+	if errClaims != nil {
 		return
 	}
 
@@ -78,19 +67,8 @@ func getFriends(w http.ResponseWriter, r *http.Request) {
 }
 
 func postFriends(w http.ResponseWriter, r *http.Request) {
-	tokenStr, err := r.Cookie("token")
-	if err != nil {
-		http.Redirect(w, r, "/sign-in/", http.StatusMovedPermanently)
-		return
-	}
-
-	claims, errValid := utils.ValidateJWT(tokenStr.Value)
-
-	if errValid != nil {
-		cookie := &http.Cookie{Path: "/", Name: "token", Value: "", HttpOnly: true, MaxAge: 1}
-		http.SetCookie(w, cookie)
-
-		http.Redirect(w, r, "/sign-in/", http.StatusMovedPermanently)
+	claims, errClaims := utils.CheckAuthRedirect(w, r)
+	if errClaims != nil {
 		return
 	}
 
@@ -108,29 +86,8 @@ func postFriends(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteFriends(w http.ResponseWriter, r *http.Request) {
-	println("deleteFriends")
-
-	// println(r.Method)
-	// r.Method = "GET"
-	// println(r.Method)
-
-	tokenStr, err := r.Cookie("token")
-	if err != nil {
-		println("err != nil")
-
-		http.Redirect(w, r, "/sign-in/", http.StatusMovedPermanently)
-		return
-	}
-
-	claims, errValid := utils.ValidateJWT(tokenStr.Value)
-
-	if errValid != nil {
-		println("errValid != nil")
-
-		cookie := &http.Cookie{Path: "/", Name: "token", Value: "", HttpOnly: true, MaxAge: 1}
-		http.SetCookie(w, cookie)
-
-		http.Redirect(w, r, "/sign-in/", http.StatusMovedPermanently)
+	claims, errClaims := utils.CheckAuthRedirect(w, r)
+	if errClaims != nil {
 		return
 	}
 
@@ -143,9 +100,8 @@ func deleteFriends(w http.ResponseWriter, r *http.Request) {
 
 	friendId := friendIds[0]
 	selfId := claims.Id
-	println("friendId", friendId)
-	errDeleteFriend := dal.DeleteFriend(selfId, friendId)
 
+	errDeleteFriend := dal.DeleteFriend(selfId, friendId)
 	if errDeleteFriend != nil {
 		http.Error(w, "Ошибка!", http.StatusInternalServerError)
 		return
