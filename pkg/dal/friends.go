@@ -3,14 +3,14 @@ package dal
 import (
 	"database/sql"
 	"fmt"
-	"highload-architect/pkg/constants"
+	"highload-architect/pkg/config"
 	"highload-architect/pkg/structs"
 )
 
 func getFriendsByParams(id uint16, joinParam string, joinBy string) ([]structs.User, error) {
 	var users []structs.User
 
-	db, dbErr := sql.Open("mysql", constants.DBConfig)
+	db, dbErr := sql.Open("mysql", config.GetDbConfig())
 	if dbErr != nil {
 		return users, dbErr
 	}
@@ -49,7 +49,7 @@ func getFriendsByParams(id uint16, joinParam string, joinBy string) ([]structs.U
 }
 
 func deleteFriendsById(friendId string, side string) error {
-	db, dbErr := sql.Open("mysql", constants.DBConfig)
+	db, dbErr := sql.Open("mysql", config.GetDbConfig())
 	if dbErr != nil {
 		return dbErr
 	}
@@ -73,7 +73,7 @@ func deleteFriendsById(friendId string, side string) error {
 func GetFriends(id uint16) ([]structs.User, error) {
 	var users []structs.User
 
-	db, dbErr := sql.Open("mysql", constants.DBConfig)
+	db, dbErr := sql.Open("mysql", config.GetDbConfig())
 	if dbErr != nil {
 		return users, dbErr
 	}
@@ -97,7 +97,7 @@ func GetFriends(id uint16) ([]structs.User, error) {
 
 func CreateFriends(id uint16, friendId string) error {
 
-	db, dbErr := sql.Open("mysql", constants.DBConfig)
+	db, dbErr := sql.Open("mysql", config.GetDbConfig())
 	if dbErr != nil {
 		return dbErr
 	}
@@ -117,7 +117,7 @@ func CreateFriends(id uint16, friendId string) error {
 }
 
 func DeleteFriend(selfId uint16, friendId string) error {
-	db, dbErr := sql.Open("mysql", constants.DBConfig)
+	db, dbErr := sql.Open("mysql", config.GetDbConfig())
 	if dbErr != nil {
 		return dbErr
 	}

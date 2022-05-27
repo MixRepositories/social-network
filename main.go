@@ -6,6 +6,7 @@ import (
 	"highload-architect/pkg/handlers"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 )
 
 func handlerRequests() {
@@ -19,7 +20,12 @@ func handlerRequests() {
 	http.ListenAndServe(":4549", nil)
 }
 
+func init() {
+	if err := godotenv.Load(); err != nil {
+		println("No .env file found")
+	}
+}
+
 func main() {
-	println("Server starting")
 	handlerRequests()
 }

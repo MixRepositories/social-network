@@ -3,14 +3,14 @@ package dal
 import (
 	"database/sql"
 	"fmt"
-	"highload-architect/pkg/constants"
+	"highload-architect/pkg/config"
 	"highload-architect/pkg/structs"
 )
 
 func GetAuthUser(email string, hashPassword string) (structs.User, error) {
 	var user structs.User
 
-	db, dbErr := sql.Open("mysql", constants.DBConfig)
+	db, dbErr := sql.Open("mysql", config.GetDbConfig())
 	if dbErr != nil {
 		return user, dbErr
 	}
@@ -48,7 +48,7 @@ func GetAuthUser(email string, hashPassword string) (structs.User, error) {
 func GetUserById(id uint16) (structs.User, error) {
 	var user structs.User
 
-	db, dbErr := sql.Open("mysql", constants.DBConfig)
+	db, dbErr := sql.Open("mysql", config.GetDbConfig())
 	if dbErr != nil {
 		return user, dbErr
 	}
@@ -92,7 +92,7 @@ func CreateUser(
 	age string,
 	city string,
 ) error {
-	db, err := sql.Open("mysql", constants.DBConfig)
+	db, err := sql.Open("mysql", config.GetDbConfig())
 	if err != nil {
 		return err
 	}
@@ -133,7 +133,7 @@ func GetUsers(exception []uint16) ([]structs.User, error) {
 		}
 	}
 
-	db, dbErr := sql.Open("mysql", constants.DBConfig)
+	db, dbErr := sql.Open("mysql", config.GetDbConfig())
 	if dbErr != nil {
 		return users, dbErr
 	}
