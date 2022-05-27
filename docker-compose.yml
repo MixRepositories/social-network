@@ -1,7 +1,7 @@
 version: '2.1'
 
 services:
-  go:
+  app:
     build:
       context: .
       dockerfile: DockerFile
@@ -14,7 +14,6 @@ services:
       - 8080:4549
     depends_on:
       - "mysql"
-      - "nginx"
 
   mysql:
     image: docker.io/bitnami/mysql:8.0
@@ -44,22 +43,26 @@ services:
       - PMA_HOST=mysql
     depends_on:
       - "mysql"
-  
+
   nginx:
     image: nginx
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/fun_friends.conf
+      - ./nginx.conf:/etc/nginx/conf.d/
     command: [ nginx-debug, '-g', 'daemon off;' ]
-  
-  certbot:
-    container_name: certbot
-    image: certbot/certbot
-    volumes:
-      - ./etc-letsencrypt:/etc/letsencrypt
-      - ./www-html:/var/www/html
-    command: certonly --webroot --webroot-path=/var/www/html --email cheprasov.dev@gmail.com --agree-tos --no-eff-email -d cheprasov-personal.site
+    ports:
+      - 80:80
     depends_on:
-      - nginx
+      - "mysql"
+      - "app"
+  # certbot:
+  #   container_name: certbot
+  #   image: certbot/certbot
+  #   volumes:
+  #     - ./etc-letsencrypt:/etc/letsencrypt
+  #     - ./www-html:/var/www/html
+  #   command: certonly --webroot --webroot-path=/var/www/html --email cheprasov.dev@gmail.com --agree-tos --no-eff-email -d cheprasov-personal.site
+  #   depends_on:
+  #     - nginx
 
 volumes:
   etc-letsencrypt:
