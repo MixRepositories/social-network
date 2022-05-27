@@ -55,8 +55,8 @@ services:
     container_name: certbot
     image: certbot/certbot
     volumes:
-      - etc-letsencrypt:/etc/letsencrypt
-      - www-html:/var/www/html
+      - ./etc-letsencrypt:/etc/letsencrypt
+      - ./www-html:/var/www/html
     command: certonly --webroot --webroot-path=/var/www/html --email cheprasov.dev@gmail.com --agree-tos --no-eff-email -d cheprasov-personal.site
     depends_on:
       - nginx
