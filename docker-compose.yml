@@ -47,7 +47,7 @@ services:
   nginx:
     image: nginx
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/
+      - ./nginx-conf.d:/etc/nginx/conf.d/
       - ./www-html:/var/www/html
     command: [ nginx-debug, '-g', 'daemon off;' ]
     ports:
