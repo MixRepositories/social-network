@@ -47,7 +47,7 @@ services:
   web:
     image: nginx
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/fun_friends.conf:ro
+      - ./nginx.conf:/etc/nginx/conf.d/fun_friends.conf
     command: [ nginx-debug, '-g', 'daemon off;' ]
 
 volumes:
