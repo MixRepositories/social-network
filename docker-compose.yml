@@ -51,7 +51,7 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/fun_friends.conf
     command: [ nginx-debug, '-g', 'daemon off;' ]
   
-  cerbot:
+  certbot:
     container_name: certbot
     image: certbot/certbot
     volumes:
