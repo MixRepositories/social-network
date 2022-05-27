@@ -48,26 +48,44 @@ func getFriendsByParams(id uint16, joinParam string, joinBy string) ([]structs.U
 	return users, nil
 }
 
-func deleteFriendsById(friendId string, side string) error {
+func deleteFriendsById(initiator string, target string) error {
 	db, dbErr := sql.Open("mysql", config.GetDbConfig())
 	if dbErr != nil {
 		return dbErr
 	}
 
-	result, err := db.Query(
-		fmt.Sprintf(
-			"DELETE FROM `friends` WHERE `%s` = %s",
-			side,
-			friendId,
-		),
-	)
+	tx, err := db.Begin()
 	if err != nil {
 		return err
 	}
 
-	result.Close()
+	_, err_1 := tx.Exec(
+		fmt.Sprintf(
+			"DELETE FROM `friends` WHERE `initiator` = %s AND `target` = %s",
+			initiator,
+			target,
+		),
+	)
+	if err_1 != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err_2 := tx.Exec(
+		fmt.Sprintf(
+			"DELETE FROM `friends` WHERE `initiator` = %s AND `target` = %s",
+			target,
+			initiator,
+		),
+	)
+	if err_2 != nil {
+		tx.Rollback()
+		return err_2
+	}
+
+	err = tx.Commit()
 	db.Close()
-	return nil
+	return err
 }
 
 func GetFriends(id uint16) ([]structs.User, error) {
@@ -96,7 +114,6 @@ func GetFriends(id uint16) ([]structs.User, error) {
 }
 
 func CreateFriends(id uint16, friendId string) error {
-
 	db, dbErr := sql.Open("mysql", config.GetDbConfig())
 	if dbErr != nil {
 		return dbErr
@@ -117,41 +134,6 @@ func CreateFriends(id uint16, friendId string) error {
 }
 
 func DeleteFriend(selfId uint16, friendId string) error {
-	db, dbErr := sql.Open("mysql", config.GetDbConfig())
-	if dbErr != nil {
-		return dbErr
-	}
-
-	tx, err := db.Begin()
-	if err != nil {
-		return err
-	}
-
-	_, err_1 := tx.Exec(
-		fmt.Sprintf(
-			"DELETE FROM `friends` WHERE `initiator` = %d AND `target` = %s",
-			selfId,
-			friendId,
-		),
-	)
-	if err_1 != nil {
-		tx.Rollback()
-		return err_1
-	}
-
-	_, err_2 := tx.Exec(
-		fmt.Sprintf(
-			"DELETE FROM `friends` WHERE `initiator` = %s AND `target` = %d",
-			friendId,
-			selfId,
-		),
-	)
-	if err_2 != nil {
-		tx.Rollback()
-		return err_2
-	}
-
-	db.Close()
-	err = tx.Commit()
+	err := deleteFriendsById(fmt.Sprintf("%d", selfId), friendId)
 	return err
 }
