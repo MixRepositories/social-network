@@ -1,3 +1,3 @@
 package constants
 
-var DBConfig string = "admin:!Novosib54@tcp(localhost:3306)/social_network"
+var DBConfig string = "root:password123@tcp(localhost:3306)/fun_friends"

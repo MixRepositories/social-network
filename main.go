@@ -20,5 +20,6 @@ func handlerRequests() {
 }
 
 func main() {
+	println("Server starting")
 	handlerRequests()
 }

@@ -1,4 +1,5 @@
-version: '3'
+version: '2.1'
+
 services:
   go:
     build:
@@ -12,22 +13,37 @@ services:
     ports:
       - 8080:4549
     depends_on:
-      - "db"
+      - "mysql"
 
-  db:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: '!Novosib54'
-      MYSQL_DATABASE: social_network
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: '!Novosib54'
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - db-data:/var/lib/mysql
-      - ./db/:/etc/mysql/conf.d/
+  mysql:
+    image: docker.io/bitnami/mysql:8.0
     ports:
-      - 3306:3306
+      - '3306:3306'
+    volumes:
+      - 'mysql_data:/bitnami/mysql/data'
+    environment:
+      - MYSQL_DATABASE=fun_friends
+      - MYSQL_ROOT_PASSWORD=password123
+      - MYSQL_USER=my_user
+      - MYSQL_PASSWORD=my_password
+      - MYSQL_AUTHENTICATION_PLUGIN=mysql_native_password
+    healthcheck:
+      test: [ 'CMD', '/opt/bitnami/scripts/mysql/healthcheck.sh' ]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 3535:80
+    environment:
+      - PMA_ARBITRARY=0
+      - PMA_HOST=mysql
+    depends_on:
+      - "mysql"
 
 volumes:
-  db-data:
+  mysql_data:
     driver: local

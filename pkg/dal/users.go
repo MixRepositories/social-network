@@ -68,7 +68,6 @@ func GetUserById(id uint16) (structs.User, error) {
 			&user.FirstName,
 			&user.LastName,
 			&user.City,
-			&user.Interests,
 			&user.Gender,
 			&user.Birthday,
 		)
@@ -92,7 +91,6 @@ func CreateUser(
 	gender string,
 	age string,
 	city string,
-	interests string,
 ) error {
 	db, err := sql.Open("mysql", constants.DBConfig)
 	if err != nil {
@@ -101,7 +99,7 @@ func CreateUser(
 
 	insert, insertErr := db.Query(
 		fmt.Sprintf(
-			"INSERT INTO `users` (`email`, `password`, `first_name`, `last_name`, `birthday`, `gender`, `city`, `interests`) value ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+			"INSERT INTO `users` (`email`, `password`, `first_name`, `last_name`, `birthday`, `gender`, `city`) value ('%s', '%s', '%s', '%s', '%s', '%s', '%s')",
 			email,
 			hashPassword,
 			firstName,
@@ -109,7 +107,6 @@ func CreateUser(
 			birthday,
 			gender,
 			city,
-			interests,
 		),
 	)
 

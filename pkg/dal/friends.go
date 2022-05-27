@@ -78,12 +78,12 @@ func GetFriends(id uint16) ([]structs.User, error) {
 		return users, dbErr
 	}
 
-	resultUser_1, resultErrUser_1 := getFriendsByParams(id, "user_id_2", "user_id_1")
+	resultUser_1, resultErrUser_1 := getFriendsByParams(id, "target", "initiator")
 	if resultErrUser_1 != nil {
 		return users, resultErrUser_1
 	}
 
-	resultUser_2, resultErrUser_2 := getFriendsByParams(id, "user_id_1", "user_id_2")
+	resultUser_2, resultErrUser_2 := getFriendsByParams(id, "initiator", "target")
 	if resultErrUser_2 != nil {
 		return users, resultErrUser_2
 	}
@@ -104,7 +104,7 @@ func CreateFriends(id uint16, friendId string) error {
 
 	_, err := db.Query(
 		fmt.Sprintf(
-			"INSERT INTO friends (user_id_1, user_id_2) VALUES (%d, %s)",
+			"INSERT INTO friends (initiator, target) VALUES (%d, %s)",
 			id,
 			friendId,
 		),
@@ -117,7 +117,6 @@ func CreateFriends(id uint16, friendId string) error {
 }
 
 func DeleteFriend(selfId uint16, friendId string) error {
-	println("dal DeleteFriend")
 	db, dbErr := sql.Open("mysql", constants.DBConfig)
 	if dbErr != nil {
 		return dbErr
@@ -130,7 +129,7 @@ func DeleteFriend(selfId uint16, friendId string) error {
 
 	_, err_1 := tx.Exec(
 		fmt.Sprintf(
-			"DELETE FROM `friends` WHERE `user_id_1` = %d AND `user_id_2` = %s",
+			"DELETE FROM `friends` WHERE `initiator` = %d AND `target` = %s",
 			selfId,
 			friendId,
 		),
@@ -142,7 +141,7 @@ func DeleteFriend(selfId uint16, friendId string) error {
 
 	_, err_2 := tx.Exec(
 		fmt.Sprintf(
-			"DELETE FROM `friends` WHERE `user_id_1` = %s AND `user_id_2` = %d",
+			"DELETE FROM `friends` WHERE `initiator` = %s AND `target` = %d",
 			friendId,
 			selfId,
 		),

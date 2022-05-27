@@ -34,7 +34,6 @@ func postSignUp(w http.ResponseWriter, r *http.Request) {
 	gender := r.FormValue("gender")
 	age := r.FormValue("age")
 	city := r.FormValue("city")
-	interests := r.FormValue("interests")
 	birthday := r.FormValue("birthday")
 
 	hashPassword := utils.GetHashString(password)
@@ -48,7 +47,6 @@ func postSignUp(w http.ResponseWriter, r *http.Request) {
 		gender,
 		age,
 		city,
-		interests,
 	)
 
 	if createErr != nil {

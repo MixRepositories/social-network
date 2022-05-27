@@ -16,7 +16,6 @@ type TmpData struct {
 }
 
 func Friends(w http.ResponseWriter, r *http.Request) {
-	println(r.Method)
 	switch r.Method {
 	case "GET":
 		getFriends(w, r)
