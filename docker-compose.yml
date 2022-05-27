@@ -14,7 +14,7 @@ services:
       - 8080:4549
     depends_on:
       - "mysql"
-      - "web"
+      - "nginx"
 
   mysql:
     image: docker.io/bitnami/mysql:8.0
@@ -44,12 +44,24 @@ services:
       - PMA_HOST=mysql
     depends_on:
       - "mysql"
-  web:
+  
+  nginx:
     image: nginx
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/fun_friends.conf
     command: [ nginx-debug, '-g', 'daemon off;' ]
+  
+  cerbot:
+    container_name: certbot
+    image: certbot/certbot
+    volumes:
+      - etc-letsencrypt:/etc/letsencrypt
+      - www-html:/var/www/html
+    command: certonly --webroot --webroot-path=/var/www/html --email cheprasov.dev@gmail.com --agree-tos --no-eff-email -d cheprasov-personal.site
+    depends_on:
+      - nginx
 
 volumes:
+  etc-letsencrypt:
   mysql_data:
     driver: local
