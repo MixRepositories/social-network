@@ -22,10 +22,10 @@ services:
     volumes:
       - 'mysql_data:/bitnami/mysql/data'
     environment:
-      - MYSQL_DATABASE=fun_friends
-      - MYSQL_ROOT_PASSWORD=password123
-      - MYSQL_USER=my_user
-      - MYSQL_PASSWORD=my_password
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_AUTHENTICATION_PLUGIN=mysql_native_password
     healthcheck:
       test: [ 'CMD', '/opt/bitnami/scripts/mysql/healthcheck.sh' ]
@@ -50,7 +50,7 @@ services:
       - ./nginx-conf.d:/etc/nginx/conf.d/
     command: [ nginx-debug, '-g', 'daemon off;' ]
     ports:
-      - 80:80
+      - 9977:80
     depends_on:
       - "mysql"
       - "app"
