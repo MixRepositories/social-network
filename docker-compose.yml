@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: DockerFile
-    command: /bin/sh -c "go run main.go"
+    command: /bin/sh -c "go build main.go && ./main"
     stdin_open: true
     tty: true
     volumes:
