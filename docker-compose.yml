@@ -50,7 +50,8 @@ services:
       - ./nginx-conf.d:/etc/nginx/conf.d/
     command: [ nginx-debug, '-g', 'daemon off;' ]
     ports:
-      - 9977:80
+      - 80:80
+      - 443:443
     depends_on:
       - "mysql"
       - "app"
