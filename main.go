@@ -17,7 +17,7 @@ func handlerRequests() {
 	http.HandleFunc("/profile/", handlers.Profile)
 	http.HandleFunc("/friends/", handlers.Friends)
 
-	http.ListenAndServe(":4549", nil)
+	http.ListenAndServe(":8080", nil)
 }
 
 func init() {

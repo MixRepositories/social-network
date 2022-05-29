@@ -11,7 +11,7 @@ services:
     volumes:
       - .:/app
     ports:
-      - 8080:4549
+      - 8080:8080
     depends_on:
       - "mysql"
 
@@ -34,13 +34,19 @@ services:
       retries: 6
 
   phpmyadmin:
-    image: phpmyadmin
-    restart: always
+    build: .
     ports:
-      - 3535:80
-    environment:
-      - PMA_ARBITRARY=0
-      - PMA_HOST=mysql
+      - '80:8181'
+      - '443:8143'
+    volumes:
+      - 'phpmyadmin_data:/bitnami/mariadb'
+    # image: phpmyadmin
+    # restart: always
+    # ports:
+    #   - 3535:80
+    # environment:
+    #   - PMA_ARBITRARY=0
+    #   - PMA_HOST=mysql
     depends_on:
       - "mysql"
 
