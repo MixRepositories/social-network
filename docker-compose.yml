@@ -75,3 +75,5 @@ volumes:
   etc-letsencrypt:
   mysql_data:
     driver: local
+  phpmyadmin_data:
+    driver: local
