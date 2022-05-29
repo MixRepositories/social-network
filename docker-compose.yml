@@ -39,7 +39,7 @@ services:
       - '80:8181'
       - '443:8143'
     volumes:
-      - 'phpmyadmin_data:/bitnami/mariadb'
+      - 'phpmyadmin_data:/bitnami/mysql/data'
     # image: phpmyadmin
     # restart: always
     # ports:
