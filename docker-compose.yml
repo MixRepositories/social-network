@@ -36,8 +36,7 @@ services:
   phpmyadmin:
     image: docker.io/bitnami/phpmyadmin:5
     ports:
-      - '80:8181'
-      - '443:8143'
+      - '3535:8181'
     volumes:
       - 'phpmyadmin_data:/bitnami/mysql/data'
     # image: phpmyadmin
