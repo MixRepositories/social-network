@@ -2,5 +2,5 @@ package config
 
 func GetDbConfig() string {
 	conf := New()
-	return conf.DbUsername + ":" + conf.DbPassword + "@(localhost:3306)/" + conf.DbName
+	return conf.DbUsername + ":" + conf.DbPassword + "@(mysql:3306)/" + conf.DbName
 }
