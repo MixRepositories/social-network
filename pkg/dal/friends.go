@@ -1,16 +1,14 @@
 package dal
 
 import (
-	"database/sql"
 	"fmt"
-	"highload-architect/pkg/config"
 	"highload-architect/pkg/structs"
 )
 
 func getFriendsByParams(id uint16, joinParam string, joinBy string) ([]structs.User, error) {
 	var users []structs.User
 
-	db, dbErr := sql.Open("mysql", config.GetDbConfig())
+	db, dbErr := getDbConnect()
 	if dbErr != nil {
 		return users, dbErr
 	}
@@ -49,7 +47,7 @@ func getFriendsByParams(id uint16, joinParam string, joinBy string) ([]structs.U
 }
 
 func deleteFriendsById(initiator string, target string) error {
-	db, dbErr := sql.Open("mysql", config.GetDbConfig())
+	db, dbErr := getDbConnect()
 	if dbErr != nil {
 		return dbErr
 	}
@@ -91,11 +89,6 @@ func deleteFriendsById(initiator string, target string) error {
 func GetFriends(id uint16) ([]structs.User, error) {
 	var users []structs.User
 
-	db, dbErr := sql.Open("mysql", config.GetDbConfig())
-	if dbErr != nil {
-		return users, dbErr
-	}
-
 	resultUser_1, resultErrUser_1 := getFriendsByParams(id, "target", "initiator")
 	if resultErrUser_1 != nil {
 		return users, resultErrUser_1
@@ -109,12 +102,11 @@ func GetFriends(id uint16) ([]structs.User, error) {
 	users = append(users, resultUser_1...)
 	users = append(users, resultUser_2...)
 
-	db.Close()
 	return users, nil
 }
 
 func CreateFriends(id uint16, friendId string) error {
-	db, dbErr := sql.Open("mysql", config.GetDbConfig())
+	db, dbErr := getDbConnect()
 	if dbErr != nil {
 		return dbErr
 	}
