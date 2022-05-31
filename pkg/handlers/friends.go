@@ -29,12 +29,19 @@ func Friends(w http.ResponseWriter, r *http.Request) {
 }
 
 func getFriends(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	searchNames, present := query["searchName"]
+	var searchName string
+	if present || len(searchNames) != 0 {
+		searchName = searchNames[0]
+	}
+
 	claims, errClaims := utils.CheckAuthRedirect(w, r)
 	if errClaims != nil {
 		return
 	}
 
-	friends, friendsErr := dal.GetFriends(claims.Id)
+	friends, friendsErr := dal.GetFriends(claims.Id, searchName)
 
 	if friendsErr != nil {
 		fmt.Println("friendsErr", friendsErr)
@@ -50,7 +57,7 @@ func getFriends(w http.ResponseWriter, r *http.Request) {
 
 	var tmpData TmpData
 
-	users, usersErr := dal.GetUsers(exception)
+	users, usersErr := dal.GetUsers(exception, searchName)
 
 	if usersErr != nil {
 		fmt.Println(usersErr)

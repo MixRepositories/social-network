@@ -35,13 +35,22 @@
     </header>
     <main class="container-xxl mt-5">
 
+        <form method="GET" action="/friends" class="mb-3">
+            <label for="searchName" class="form-label">First or last name</label>
+            <div class="d-flex justify-content-between">
+                <input class="form-control" name="searchName" id="searchName" aria-describedby="name">
+                <button type="submit" class="btn btn-primary">Find</button>
+            </div>
+        </form>
+
         <div class="row">
             <div class="col">
                 <ul class="list-group">
                     <li class="list-group mb-2">Пользователи:</li>
                     {{range .Users}}
                     <li class="list-group-item">
-                        <form method="POST" action="/friends/">
+                        <form method="POST" action="/friends/"
+                            class="d-flex justify-content-between align-items-center">
                             {{.Id}} {{.FirstName}} {{.LastName}}
                             <input name="friendId" value={{.Id}} hidden>
                             <button type="submit" class="btn btn-primary">Add</button>
@@ -55,7 +64,7 @@
                 <ul class="list-group">
                     <li class="list-group mb-2">Друзья:</li>
                     {{range .Friends}}
-                    <li class="list-group-item">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
                         {{.Id}} {{.FirstName}} {{.LastName}}
                         <button class="btn btn-danger button_delete" data-id={{.Id}}>Delete</button>
                     </li>
@@ -74,7 +83,7 @@
         crossorigin="anonymous"></script>
     <script>
         let addButtons = document.getElementsByClassName('button_delete');
-        
+
         [...addButtons].forEach(item => {
             item.addEventListener('click', async (e) => {
                 const result = await fetch('/friends/?friendId=' + e.target.dataset.id, {

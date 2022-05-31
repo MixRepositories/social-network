@@ -10,6 +10,7 @@ type Config struct {
 	DbUsername string
 	DbPassword string
 	DbName     string
+	DbHost     string
 }
 
 // New returns a new Config struct
@@ -18,6 +19,7 @@ func New() *Config {
 		DbUsername: getEnv("MYSQL_USER", "test"),
 		DbPassword: getEnv("MYSQL_PASSWORD", "test"),
 		DbName:     getEnv("MYSQL_DATABASE", "test"),
+		DbHost:     getEnv("MYSQL_HOST", "test"),
 	}
 }
 

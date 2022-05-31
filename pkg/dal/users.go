@@ -117,7 +117,7 @@ func CreateUser(
 	return nil
 }
 
-func GetUsers(exception []uint16) ([]structs.User, error) {
+func GetUsers(exception []uint16, searchName string) ([]structs.User, error) {
 	var users []structs.User
 
 	var exceptionStr string
@@ -136,9 +136,16 @@ func GetUsers(exception []uint16) ([]structs.User, error) {
 		return users, dbErr
 	}
 
-	result, resultErr := db.Query(
-		fmt.Sprintf("SELECT `id`, `email`, `first_name`, `last_name` FROM `users` WHERE id not in (%s)", exceptionStr),
-	)
+	query := fmt.Sprintf("SELECT `id`, `email`, `first_name`, `last_name` FROM `users` WHERE id not in (%s)", exceptionStr)
+
+	if len(searchName) > 0 {
+		like := "%" + searchName + "%"
+		query = query + " " + fmt.Sprintf("AND `first_name` LIKE '%s' OR `last_name` LIKE '%s'", like, like)
+	}
+
+	query = query + " ORDER BY id LIMIT 20"
+
+	result, resultErr := db.Query(query)
 
 	if resultErr != nil {
 		return users, resultErr

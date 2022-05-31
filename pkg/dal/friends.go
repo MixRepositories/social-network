@@ -5,7 +5,7 @@ import (
 	"highload-architect/pkg/structs"
 )
 
-func getFriendsByParams(id uint16, joinParam string, joinBy string) ([]structs.User, error) {
+func getFriendsByParams(id uint16, joinParam string, joinBy string, searchName string) ([]structs.User, error) {
 	var users []structs.User
 
 	db, dbErr := getDbConnect()
@@ -13,14 +13,20 @@ func getFriendsByParams(id uint16, joinParam string, joinBy string) ([]structs.U
 		return users, dbErr
 	}
 
-	result, err := db.Query(
-		fmt.Sprintf(
-			"SELECT `id`, `first_name`, `last_name` FROM friends f LEFT JOIN users u ON u.id=%s WHERE f.%s='%d'",
-			joinParam,
-			joinBy,
-			id,
-		),
+	query := fmt.Sprintf(
+		"SELECT `id`, `first_name`, `last_name` FROM friends f LEFT JOIN users u ON u.id=%s WHERE f.%s='%d'",
+		joinParam,
+		joinBy,
+		id,
 	)
+
+	if len(searchName) > 0 {
+		like := "%" + searchName + "%"
+		query = query + " " + fmt.Sprintf("AND `first_name` LIKE '%s' OR `last_name` LIKE '%s'", like, like)
+	}
+	query = query + " ORDER BY id LIMIT 20"
+
+	result, err := db.Query(query)
 	if err != nil {
 		return users, err
 	}
@@ -86,15 +92,15 @@ func deleteFriendsById(initiator string, target string) error {
 	return err
 }
 
-func GetFriends(id uint16) ([]structs.User, error) {
+func GetFriends(id uint16, searchName string) ([]structs.User, error) {
 	var users []structs.User
 
-	resultUser_1, resultErrUser_1 := getFriendsByParams(id, "target", "initiator")
+	resultUser_1, resultErrUser_1 := getFriendsByParams(id, "target", "initiator", searchName)
 	if resultErrUser_1 != nil {
 		return users, resultErrUser_1
 	}
 
-	resultUser_2, resultErrUser_2 := getFriendsByParams(id, "initiator", "target")
+	resultUser_2, resultErrUser_2 := getFriendsByParams(id, "initiator", "target", searchName)
 	if resultErrUser_2 != nil {
 		return users, resultErrUser_2
 	}
