@@ -22,7 +22,7 @@ func getFriendsByParams(id uint16, joinParam string, joinBy string, searchName s
 
 	if len(searchName) > 0 {
 		like := "%" + searchName + "%"
-		query = query + " " + fmt.Sprintf("AND `first_name` LIKE '%s' OR `last_name` LIKE '%s'", like, like)
+		query = query + " " + fmt.Sprintf("AND (`first_name` LIKE '%s' OR `last_name` LIKE '%s')", like, like)
 	}
 	query = query + " ORDER BY id LIMIT 20"
 
